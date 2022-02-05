@@ -1,5 +1,7 @@
 ---
-title: "R Notebook"
+title: "Data 608 - Assignment 1"
+author: "Matthew Lucich"
+date: "2/4/2022"
 output:
   html_document: default
   html_notebook: default
@@ -68,7 +70,9 @@ inc %>%
 	group_by(State) %>% 
 	summarise(count = n()) %>% 
 	ggplot(aes(x = reorder(State,(count)), y = count)) + 
-		geom_bar(stat = "identity", color="grey", fill="lightblue", width=0.7) + 
+		geom_bar(stat = "identity", color="#003049", fill="#669bbc", width=0.8) + 
+    theme(panel.background = element_rect(fill = NA),panel.grid.major = element_line(colour = "#555b6e20"),
+                   axis.ticks = element_blank()) +
     coord_flip() + labs(title="Companies by State", x ="State", y = "Number of Companies")
 
 ```
@@ -84,19 +88,21 @@ Lets dig in on the state with the 3rd most companies in the data set. Imagine yo
 inc_ny <- inc %>% 
   filter(complete.cases(.) & grepl('NY', State))
 
-q3 <- quantile(inc_ny$Employees,  probs = 0.75)
-# Usually 1.5, but changed to 3 for extra padding
-upper.bound <- 13 * IQR(inc_ny$Employees)
-
-industry.median <- summarise(group_by(inc_ny, Industry), RPE = median(Employees))
+industry.median <- summarise(group_by(inc_ny, Industry), med = median(Employees))
 
 options(scipen=10000)
 ggplot(inc_ny, aes(x=reorder(Industry, Employees, median, na.rm = TRUE,), y=Employees)) + 
-    geom_boxplot(fill = "lightblue", color="grey", outlier.colour="red", outlier.shape=16,
-             outlier.size=2, notch=FALSE) + geom_text(data = industry.median, aes(Industry, RPE, label = RPE), 
-             color="steelblue") + coord_flip(ylim = c(0, upper.bound)) +
-             labs(title="Employees by Industry", x ="Industry", y = "Number of Employees")
-
+    stat_boxplot(geom = "errorbar", width=0.5, size=1, color="#003049") +
+    geom_boxplot(fill = "#669bbc", color="#003049", outlier.colour="#c1121f50", outlier.shape=16,
+             outlier.size=2, notch=FALSE) + 
+             scale_y_log10(labels = scales::comma_format(accuracy = 1)) +
+             theme(panel.background = element_rect(fill = NA),panel.grid.major = element_line(colour = "#555b6e20"),
+                   axis.ticks = element_blank()) +
+             geom_text(data = industry.median, aes(Industry, med, label = med), 
+             size=2.5, color="#fdf0d5") + coord_flip() +
+             labs(title="New York Companies - Employees by Industry (log scale)", 
+                  x ="Industry", y = "Number of Employees")
+        
 ```
 
 
@@ -111,20 +117,21 @@ inc <- inc %>%
   filter(complete.cases(.)) %>%
   mutate(revenue_per_employee = Revenue / Employees)
 
-q3 <- quantile(inc$revenue_per_employee,  probs = 0.75)
-# Usually 1.5, but changed to 3 for extra padding
-upper.bound <- 7 * IQR(inc$revenue_per_employee)
-
-industry.median <- summarise(group_by(inc, Industry), RPE = median(revenue_per_employee))
+industry.median <- summarise(group_by(inc, Industry), med = median(revenue_per_employee))
 industry.median <- industry.median %>%  mutate_if(is.numeric, round)
 
 options(scipen=10000)
 ggplot(inc, aes(x=reorder(Industry, revenue_per_employee, median, na.rm = TRUE), y=revenue_per_employee)) + 
-    geom_boxplot(fill = "lightblue", color="grey", outlier.colour="red", outlier.shape=16,
+    stat_boxplot(geom = "errorbar", width=0.5, size=1, color="#003049") +
+    geom_boxplot(fill = "#669bbc", color="#003049", outlier.colour="#c1121f50", outlier.shape=16,
              outlier.size=2, notch=FALSE) +
-             geom_text(data = industry.median, aes(Industry, RPE, label = scales::comma(RPE)), color="steelblue") + 
-             coord_flip(ylim = c(0, upper.bound)) +
-             labs(title="Revenue per Employee by Industry", x ="Industry", y = "Revenue per Employee")
+             theme(panel.background = element_rect(fill = NA), panel.grid.major = element_line(colour = "#555b6e20"),
+                   axis.ticks = element_blank()) +
+             scale_y_log10(label = scales::comma) +
+             geom_text(data = industry.median, aes(Industry, med, label = scales::comma(med)),
+                       size=2.5, color="#fdf0d5") + 
+             coord_flip() +
+             labs(title="Revenue per Employee by Industry (log scale)", x ="Industry", y = "Revenue per Employee")
 
 ```
 
