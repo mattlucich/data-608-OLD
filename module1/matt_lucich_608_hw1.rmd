@@ -73,7 +73,7 @@ inc %>%
 		geom_bar(stat = "identity", color="#003049", fill="#669bbc", width=0.8) + 
     theme(panel.background = element_rect(fill = NA),panel.grid.major = element_line(colour = "#555b6e20"),
                    axis.ticks = element_blank()) +
-    coord_flip() + labs(title="Companies by State", x ="State", y = "Number of Companies")
+    coord_flip() + labs(title="Fastest Growing Companies by State", x ="State", y = "Number of Fast Growing Companies")
 
 ```
 
@@ -100,7 +100,7 @@ ggplot(inc_ny, aes(x=reorder(Industry, Employees, median, na.rm = TRUE,), y=Empl
                    axis.ticks = element_blank()) +
              geom_text(data = industry.median, aes(Industry, med, label = med), 
              size=2.5, color="#fdf0d5") + coord_flip() +
-             labs(title="New York Companies - Employees by Industry (log scale)", 
+             labs(title="New York Fastest Growing Companies - Employees by Industry (log scale)", 
                   x ="Industry", y = "Number of Employees")
         
 ```
